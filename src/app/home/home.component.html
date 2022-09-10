@@ -1,0 +1,16 @@
+<div id="score">
+    <table>
+        <tr *ngFor="let row of score">
+            <td *ngFor="let button of row">
+                {{button.key}}
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="board">
+    <div id="row" *ngFor="let row of board">
+        <button id="key" *ngFor="let key of row">{{key.key}}</button>
+    </div>
+    
+</div>
