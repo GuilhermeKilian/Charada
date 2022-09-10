@@ -1,8 +1,8 @@
 #table-score{
-    width: auto;
-    height: auto;
+    width: 20em;
+    min-height: 20em;
     position: relative;
-    top: 10%;
+    top: 50%;
     transform: translate(-50%, -50%);
 }
 
@@ -10,6 +10,7 @@
     width: auto;
     height: auto;
     position: absolute;
+    top:30%;
     right: 50%;
 }
 
@@ -17,9 +18,17 @@
     width: auto;
     height: auto;
     position: relative;
-    top: 110%;
+    top: 100%;
     transform: translate(-50%, -50%);
     align-items: center;
+}
+
+.success{
+    background-color: green;
+}
+
+.close{
+    background-color: yellow;
 }
 
 table, td, tr{

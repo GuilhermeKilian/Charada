@@ -2,16 +2,15 @@
     <div id="score">
         <table id="table-score">
             <tr *ngFor="let row of score">
-                <td *ngFor="let button of row">
+                <td *ngFor="let button of row" [ngClass]="button.status">
                     {{button.value}}
                 </td>
             </tr>
         </table>
     </div>
-    
     <div id="board">
         <div id="row" *ngFor="let row of board">
-            <button (click)="addLetter(key.key)" id="key" *ngFor="let key of row" [ngClass]="key.status" >{{key.key}}</button>
+            <button (click)="addLetter(key.value)" class="" *ngFor="let key of row" [ngClass]="key.status" >{{key.value}}</button>
         </div>
     </div>
 </div>

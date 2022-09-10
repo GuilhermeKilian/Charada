@@ -3,33 +3,29 @@ import { Component, OnInit } from '@angular/core';
 import { TitleStrategy } from '@angular/router';
 
 class BoardComponent {
-  key:string;
-  status!:string;
-  value!:string
+  value:string
+  status?:string;
 
-  constructor(key:string) {   
-    this.key = key;
+  constructor(value?:string) {   
+    this.value = value === undefined ? '' : value;
     this.status = 'default';
   }
 
-  assignValue(value:string){
-    this.value = value;
-  }
+  assignValue(value:string){ this.value = value; }
 
-  isSuccess():boolean{
-    return this.status == 'success';
-  }
+  cleanValue(){this.value = ""}
 
-  isClose():boolean{
-    return this.status == 'close'
-  }
+  isSuccess():boolean{ return this.status == 'success'; }
 
-  setSuccess() {
-    this.status = 'success';
-  }
+  isClose():boolean{ return this.status == 'close' }
 
-  setClose(){
-    this.status = 'close';
+  setSuccess() { this.status = 'success'; }
+
+  setClose(){ 
+    if(this.isSuccess())
+      return;
+
+    this.status = 'close'; 
   }
 }
 
@@ -40,24 +36,24 @@ class BoardComponent {
 })
 
 export class HomeComponent implements OnInit {
-  word:string;
   score:BoardComponent[][];
   board:BoardComponent[][];
+  word:string;
+  ended:boolean;
   column:number;
   index:number;
 
   availableWords:string[] = [
-    'algoz',
-    'inato',
-    'fazer'
+    'algoz'
   ];
 
   constructor() {
-    this.word = this.randomWord();
+    this.word = this.getRandomWord();
     this.score = [];
     this.board = [];
     this.column = 0;
     this.index = 0;
+    this.ended = false;
     }
 
   ngOnInit(): void {
@@ -74,18 +70,30 @@ export class HomeComponent implements OnInit {
       return this.submitAttempt();
 
     this.score[this.column][this.index].assignValue(letter);
+
     if(this.index !== 4)
     this.index++;
   }
 
-  submitAttempt(){
-    if(this.index != 5)
+  private deleteLetter(){
+    let current = this.score[this.column][this.index];
+
+    if(current.value !== "")
+      current.cleanValue();
+    else if(this.index !== 0){
+      this.index--;
+      current.cleanValue();
+    }
+  }
+
+  private submitAttempt(){
+    if(this.index != 4)
       return;
 
-    if(this.column > 5)
+    if(this.column > 4)
       return this.endGame(false);
 
-    let win:boolean = this.validateWin(this.column);
+    let win:boolean = this.checkWinner(this.column);
     
     if(win)
       this.endGame(win);
@@ -93,74 +101,91 @@ export class HomeComponent implements OnInit {
       this.column++;
       this.index = 0;
     }
+  }  
+
+  private endGame(win:boolean){
+    this.ended = win;
+    win ? alert("Você ganhou!") : alert("Você perdeu.");    
   }
 
-  validateWin(column:number):boolean{
-    var line = this.score[column];
-    this.validateCorrectPosition(line);
-    this.validateCorrectLetter(line);
+  //#region Check Winners
 
-    line.forEach(element => {
-      
+  private checkWinner(column:number):boolean{
+    var line = this.score[column];
+    
+    this.checkCorrectPosition(line);
+    this.checkCorrectLetter(line);
+
+    let win:boolean = true;
+
+    line.forEach(l => {
+      if(!l.isSuccess())
+        win = false;
     });
 
-    return true;
+    return win;
   }
 
-  validateCorrectPosition(line:BoardComponent[]){
-    let characters = this.word.split('');
+  private checkCorrectPosition(line:BoardComponent[]){
+    let characters = this.word.toUpperCase().split('');
     for (let i = 0; i < line.length; i++) {
       let letter = line[i];
 
       if(!letter.isSuccess() && characters[i] === letter.value){
           letter.setSuccess();
+          this.setScoreStatus(letter.value, true);
       }
     }
   }
 
-  validateCorrectLetter(line:BoardComponent[]){
-    let characters = this.word.split('');
+  private checkCorrectLetter(line:BoardComponent[]){
+    let characters = this.word.toUpperCase().split('');
     for (let i = 0; i < line.length; i++) {
       let letter = line[i];
+      let hasLetter = characters.findIndex(f => f === letter.value);
 
-      if(!letter.isSuccess() && !letter.isClose()){
-        var res = characters.findIndex(f => f === letter.value);
-
-        if(res !== -1)
-          letter.setClose();
-      }
+      if(hasLetter !== -1)
+        this.setCloseStatusIfNeeded(line, letter);   
     }
   }
 
-  deleteLetter(){
-    this.score[this.column][this.index].assignValue("");
+  private setCloseStatusIfNeeded(line:BoardComponent[], letter:BoardComponent){
+    let letters = line.filter(l => l.value === letter.value);
+    let hasSuccess = false;
+    letters.forEach(letter => {
+      if(letter.isSuccess())
+        hasSuccess = true;
+    });
 
-    if(this.index != 0)
-      this.index--;
+    if(!hasSuccess){
+      letter.setClose();
+      this.setScoreStatus(letter.value, false);      
+    }
   }
 
-  endGame(win:boolean){
-    win ? alert("Você ganhou!") : alert("Você perdeu.");
-  }
-  
-  randomWord():string{
-    let max = this.availableWords.length;
-    let number = Math.trunc(Math.random() * (max));
-    return this.availableWords[number];
+  private setScoreStatus(letter:string, success:boolean ){
+    if(success)
+      this.board.find(b => b.find(d => d.value === letter)?.setSuccess())
+    else
+      this.board.find(b => b.find(d => d.value === letter)?.setClose())
   }
 
-  populateScore(): void{
+  //#endregion
+
+  //#region Inicialize
+
+  private populateScore(): void{
     this.score = [
-      [ new BoardComponent('A1'), new BoardComponent('B1'),new BoardComponent('C1'),new BoardComponent('D1'),new BoardComponent('E1') ],
-      [ new BoardComponent('A2'), new BoardComponent('B2'),new BoardComponent('C2'),new BoardComponent('D2'),new BoardComponent('E2')],
-      [ new BoardComponent('A3'), new BoardComponent('B3'),new BoardComponent('C3'),new BoardComponent('D3'),new BoardComponent('E3')],
-      [ new BoardComponent('A4'), new BoardComponent('B4'),new BoardComponent('C4'),new BoardComponent('D4'),new BoardComponent('E4')],
-      [ new BoardComponent('A5'), new BoardComponent('B5'),new BoardComponent('C5'),new BoardComponent('D5'),new BoardComponent('E5')],
-      [ new BoardComponent('A6'), new BoardComponent('B6'),new BoardComponent('C6'),new BoardComponent('D6'),new BoardComponent('E6')]
+      [ new BoardComponent(), new BoardComponent(),new BoardComponent(),new BoardComponent(),new BoardComponent() ],
+      [ new BoardComponent(), new BoardComponent(),new BoardComponent(),new BoardComponent(),new BoardComponent() ],
+      [ new BoardComponent(), new BoardComponent(),new BoardComponent(),new BoardComponent(),new BoardComponent() ],
+      [ new BoardComponent(), new BoardComponent(),new BoardComponent(),new BoardComponent(),new BoardComponent() ],
+      [ new BoardComponent(), new BoardComponent(),new BoardComponent(),new BoardComponent(),new BoardComponent() ],
+      [ new BoardComponent(), new BoardComponent(),new BoardComponent(),new BoardComponent(),new BoardComponent() ]
     ] 
   }
 
-  populateBoard(): void{
+  private populateBoard(): void{
     this.board = [
       [ 
         new BoardComponent('Q'), new BoardComponent('W'),new BoardComponent('E'),new BoardComponent('R'),new BoardComponent('T'), 
@@ -168,12 +193,21 @@ export class HomeComponent implements OnInit {
       ],
       [ 
         new BoardComponent('A'), new BoardComponent('S'),new BoardComponent('D'),new BoardComponent('F'),new BoardComponent('G'),
-        new BoardComponent('H'), new BoardComponent('J'),new BoardComponent('K'),new BoardComponent('L'),new BoardComponent('Delete')],
+        new BoardComponent('H'), new BoardComponent('J'),new BoardComponent('K'),new BoardComponent('L'),new BoardComponent('Delete')
+      ],
       [ 
         new BoardComponent('Z'), new BoardComponent('X'),new BoardComponent('C'),new BoardComponent('V'),new BoardComponent('B'),
-        new BoardComponent('N'), new BoardComponent('M'),new BoardComponent('Enter'),
+        new BoardComponent('N'), new BoardComponent('M'),new BoardComponent('Enter')
       ]
     ] 
   }
+
+  private getRandomWord():string{
+    let max = this.availableWords.length;
+    let number = Math.trunc(Math.random() * (max));
+    return this.availableWords[number];
+  }
+
+  //#endregion
 
 }
