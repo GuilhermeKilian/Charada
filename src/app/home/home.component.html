@@ -1,16 +1,17 @@
-<div id="score">
-    <table>
-        <tr *ngFor="let row of score">
-            <td *ngFor="let button of row">
-                {{button.key}}
-            </td>
-        </tr>
-    </table>
-</div>
-
-<div id="board">
-    <div id="row" *ngFor="let row of board">
-        <button id="key" *ngFor="let key of row">{{key.key}}</button>
+<div id="game">
+    <div id="score">
+        <table id="table-score">
+            <tr *ngFor="let row of score">
+                <td *ngFor="let button of row">
+                    {{button.value}}
+                </td>
+            </tr>
+        </table>
     </div>
     
+    <div id="board">
+        <div id="row" *ngFor="let row of board">
+            <button (click)="addLetter(key.key)" id="key" *ngFor="let key of row" [ngClass]="key.status" >{{key.key}}</button>
+        </div>
+    </div>
 </div>

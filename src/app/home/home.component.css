@@ -1,0 +1,27 @@
+#table-score{
+    width: auto;
+    height: auto;
+    position: relative;
+    top: 10%;
+    transform: translate(-50%, -50%);
+}
+
+#game{
+    width: auto;
+    height: auto;
+    position: absolute;
+    right: 50%;
+}
+
+#board{
+    width: auto;
+    height: auto;
+    position: relative;
+    top: 110%;
+    transform: translate(-50%, -50%);
+    align-items: center;
+}
+
+table, td, tr{
+    border: 1px solid;
+}
