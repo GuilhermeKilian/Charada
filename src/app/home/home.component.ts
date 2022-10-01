@@ -77,13 +77,11 @@ export class HomeComponent implements OnInit {
 
   private deleteLetter(){
     let current = this.score[this.column][this.index];
-
-    if(current.value !== "")
-      current.cleanValue();
-    else if(this.index !== 0){
+    
+    if(this.index !== 0)
       this.index--;
-      current.cleanValue();
-    }
+    
+    current.cleanValue();
   }
 
   private submitAttempt(){
