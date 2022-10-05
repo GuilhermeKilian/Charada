@@ -42,6 +42,13 @@ body{
     margin-top: 250px;
 }
 
+.options{
+    display: flex;
+    justify-content: right;
+    margin-right: 30px;
+    margin-top: 30px;
+}
+
 button{
     height: 48px;
     min-width: 40px;

@@ -16,7 +16,11 @@
     </div>    
     <div id="board">
         <div id="row" *ngFor="let row of board">            
-            <button (click)="addLetter(key.value)" class="" *ngFor="let key of row"  [ngClass]="key.status" >{{key.value}}</button>
+            <button (click)="addLetter(key.value)" *ngFor="let key of row"  [ngClass]="key.status" >{{key.value}}</button>
         </div>
     </div>
+</div>
+
+<div class="options">
+    <button (click)="resetGame()">Reiniciar</button>
 </div>

@@ -1,6 +1,7 @@
 import { keyframes } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
 import { TitleStrategy } from '@angular/router';
+import { WordsService } from '../words.service';
 
 class BoardComponent {
   value:string
@@ -42,13 +43,11 @@ export class HomeComponent implements OnInit {
   ended:boolean;
   column:number;
   index:number;
+  wordsService:WordsService;
 
-  availableWords:string[] = [
-    'algoz'
-  ];
-
-  constructor() {
-    this.word = this.getRandomWord();
+  constructor(private wordService: WordsService) {
+    this.wordsService = wordService;
+    this.word = wordService.getRandomWord();
     this.score = [];
     this.board = [];
     this.column = 0;
@@ -61,7 +60,19 @@ export class HomeComponent implements OnInit {
     this.populateBoard();
   }
 
+  resetGame(){
+    this.populateScore();
+    this.populateBoard();
+    this.column = 0;
+    this.index = 0;
+    this.word = this.wordService.getRandomWord();
+    this.ended = false;
+  }
+
   addLetter(letter:string){
+
+    if(this.ended)
+      return;
 
     if(letter === "Delete")
       return this.deleteLetter();
@@ -77,7 +88,7 @@ export class HomeComponent implements OnInit {
 
   private deleteLetter(){
     let current = this.score[this.column][this.index];
-    
+
     if(this.index !== 0)
       this.index--;
     
@@ -85,7 +96,8 @@ export class HomeComponent implements OnInit {
   }
 
   private submitAttempt(){
-    if(this.index != 4)
+
+    if(this.index !== 4 || this.score[this.column][this.index].value === "")
       return;
 
     if(this.column > 4)
@@ -102,7 +114,7 @@ export class HomeComponent implements OnInit {
   }  
 
   private endGame(win:boolean){
-    this.ended = win;
+    this.ended = true;
     win ? alert("Você ganhou!") : alert("Você perdeu.");    
   }
 
@@ -199,13 +211,6 @@ export class HomeComponent implements OnInit {
       ]
     ] 
   }
-
-  private getRandomWord():string{
-    let max = this.availableWords.length;
-    let number = Math.trunc(Math.random() * (max));
-    return this.availableWords[number];
-  }
-
   //#endregion
 
 }
